@@ -378,6 +378,16 @@ def create_tables(conn: sqlite3.Connection) -> None:
             name TEXT NOT NULL UNIQUE
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS visits (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            ip         TEXT,
+            path       TEXT,
+            device     TEXT,
+            user_agent TEXT,
+            visited_at TEXT
+        )
+    """)
     conn.commit()
 
 
@@ -504,8 +514,30 @@ def add_no_cache_headers(response):
     return response
 
 
+def get_client_ip() -> str:
+    fwd = request.headers.get("X-Forwarded-For", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.remote_addr or "—"
+
+
+def log_visit(path: str) -> None:
+    ua = (request.headers.get("User-Agent", "") or "")[:300]
+    device = "Телефон" if re.search(r"Mobile|Android|iPhone|iPad", ua, re.IGNORECASE) else "Компьютер"
+    try:
+        with get_connection() as conn:
+            conn.execute(
+                "INSERT INTO visits(ip, path, device, user_agent, visited_at) VALUES(?,?,?,?,?)",
+                (get_client_ip(), path, device, ua, datetime.now().isoformat(timespec="seconds")),
+            )
+            conn.commit()
+    except Exception:
+        pass  # статистика не должна ломать сайт
+
+
 @app.route("/")
 def index():
+    log_visit("/")
     return send_from_directory(str(BASE_DIR), "Rozklad.html")
 
 
@@ -518,6 +550,99 @@ def admin():
 @app.route("/avatar.jpg")
 def avatar():
     return send_from_directory(str(BASE_DIR), "avatar.jpg")
+
+
+STATS_HTML = """<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Статистика — Расписание КФУ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(180deg,#f9fbff,#eef2ff);
+      color:#0f1d40;min-height:100vh;padding:32px 20px}
+    .wrap{max-width:1000px;margin:0 auto}
+    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+    h1{font-size:1.6rem;font-weight:800}
+    .back{color:#2f7ae3;text-decoration:none;font-weight:700;font-size:.95rem}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:28px}
+    .card{background:#fff;border-radius:20px;padding:24px;box-shadow:0 12px 30px rgba(15,29,64,.07)}
+    .card .num{font-size:2.2rem;font-weight:800;color:#2f7ae3;line-height:1}
+    .card .lbl{color:#6b7794;font-weight:700;font-size:.9rem;margin-top:8px}
+    .panel{background:#fff;border-radius:20px;padding:24px;box-shadow:0 12px 30px rgba(15,29,64,.07);margin-bottom:24px}
+    .panel h2{font-size:1.1rem;font-weight:800;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse;font-size:.9rem}
+    th{text-align:left;color:#6b7794;font-weight:700;padding:10px 12px;border-bottom:2px solid #eef1fc;font-size:.82rem}
+    td{padding:10px 12px;border-bottom:1px solid #f0f3fb;font-weight:600}
+    tr:last-child td{border-bottom:none}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700}
+    .b-phone{background:#fff0f6;color:#c2185b}
+    .b-pc{background:#eaf2ff;color:#2563c7}
+    .empty{color:#6b7794;text-align:center;padding:24px;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <h1>📊 Статистика посещений</h1>
+      <a class="back" href="/admin">← В админ-панель</a>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="num">{{ total }}</div><div class="lbl">Всего заходов</div></div>
+      <div class="card"><div class="num">{{ unique }}</div><div class="lbl">Уникальных посетителей</div></div>
+      <div class="card"><div class="num">{{ today }}</div><div class="lbl">Заходов сегодня</div></div>
+      <div class="card"><div class="num">{{ phones }}</div><div class="lbl">С телефонов</div></div>
+      <div class="card"><div class="num">{{ pcs }}</div><div class="lbl">С компьютеров</div></div>
+    </div>
+    <div class="panel">
+      <h2>Последние посещения</h2>
+      {% if recent %}
+      <table>
+        <thead><tr><th>Время</th><th>IP-адрес</th><th>Устройство</th></tr></thead>
+        <tbody>
+        {% for v in recent %}
+          <tr>
+            <td>{{ v.time }}</td>
+            <td>{{ v.ip }}</td>
+            <td><span class="badge {{ 'b-phone' if v.device == 'Телефон' else 'b-pc' }}">{{ v.device }}</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Пока нет данных о посещениях</div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>"""
+
+
+@app.route("/stats")
+@login_required
+def stats():
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).isoformat(timespec="seconds")
+    with get_connection() as conn:
+        total = conn.execute("SELECT COUNT(*) AS c FROM visits").fetchone()["c"]
+        unique = conn.execute("SELECT COUNT(DISTINCT ip) AS c FROM visits").fetchone()["c"]
+        today = conn.execute("SELECT COUNT(*) AS c FROM visits WHERE visited_at >= ?", (today_start,)).fetchone()["c"]
+        phones = conn.execute("SELECT COUNT(*) AS c FROM visits WHERE device = 'Телефон'").fetchone()["c"]
+        pcs = conn.execute("SELECT COUNT(*) AS c FROM visits WHERE device = 'Компьютер'").fetchone()["c"]
+        rows = conn.execute(
+            "SELECT ip, device, visited_at FROM visits ORDER BY id DESC LIMIT 60"
+        ).fetchall()
+
+    recent = []
+    for r in rows:
+        t = (r["visited_at"] or "").replace("T", " ")[:16]
+        recent.append({"ip": r["ip"], "device": r["device"], "time": t})
+
+    return render_template_string(
+        STATS_HTML, total=total, unique=unique, today=today,
+        phones=phones, pcs=pcs, recent=recent,
+    )
 
 # ---------------------------------------------------------------------------
 # Public API
