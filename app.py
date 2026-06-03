@@ -554,6 +554,11 @@ def avatar():
     return send_from_directory(str(BASE_DIR), "avatar.jpg")
 
 
+@app.route("/kfu.png")
+def kfu_logo():
+    return send_from_directory(str(BASE_DIR), "kfu.png")
+
+
 STATS_HTML = """<!DOCTYPE html>
 <html lang="ru">
 <head>
