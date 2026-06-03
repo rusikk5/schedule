@@ -748,7 +748,7 @@ def api_check_location_conflict():
         ).fetchall():
             lessons[lesson["row_index"]] = lesson["value"]
 
-        slot_times = ["08:30", "10:25", "12:20", "14:15", "16:10", "18:20", "20:00"]
+        slot_times = ["08:00", "09:50", "11:30", "13:20", "15:00", "16:40", "18:20"]
         conflicts = []
 
         for adj_row in (row_index - 1, row_index + 1):
