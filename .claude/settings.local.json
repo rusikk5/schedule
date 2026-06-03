@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(py --version)",
+      "PowerShell(python --version)",
+      "PowerShell(Start-Sleep -Seconds 2; try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/api/health\" -UseBasicParsing -TimeoutSec 3; $r.Content } catch { \"Ошибка: $_\" })",
+      "WebFetch(domain:schedule-cloud.cfuv.ru)",
+      "WebFetch(domain:cfuv.ru)",
+      "PowerShell(python -m pip install openpyxl --quiet)"
+    ]
+  }
+}

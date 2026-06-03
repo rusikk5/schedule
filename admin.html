@@ -1,0 +1,2133 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ-панель Расписания КФУ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7ff;
+      --surface: #ffffff;
+      --surface-strong: #eef1fc;
+      --text: #0f1d40;
+      --muted: #6b7794;
+      --blue: #2f7ae3;
+      --border: rgba(15, 29, 64, 0.08);
+      --shadow: 0 24px 60px rgba(15, 29, 64, 0.08);
+      --theme-toggle-bg: #ffffff;
+      --theme-toggle-text: #0f1d40;
+      font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: #eef2ff;
+    }
+
+    html.theme-dark {
+      background: #111d34;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f9fbff 0%, #eef2ff 100%);
+      color: var(--text);
+    }
+
+    body.theme-dark {
+      --bg: #0d1424;
+      --surface: #151f34;
+      --surface-strong: #1f2b44;
+      --text: #e5edff;
+      --muted: #9cadcd;
+      --blue: #4b8af2;
+      --border: rgba(154, 172, 205, 0.24);
+      --shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+      --theme-toggle-bg: #22304b;
+      --theme-toggle-text: #f0f5ff;
+      background: linear-gradient(180deg, #0f172a 0%, #111d34 100%);
+    }
+
+    .admin-page {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 24px 40px 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 30px rgba(15, 29, 64, 0.12);
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .logo-kfu {
+      background: linear-gradient(135deg, #2563c7 0%, #2f7ae3 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.95rem;
+      font-family: 'Nunito', Arial, sans-serif;
+      display: grid;
+      place-items: center;
+    }
+
+    .footer-kfu-logo {
+      color: rgba(255,255,255,0.9);
+      font-weight: 900;
+      font-size: 2.2rem;
+      font-family: 'Nunito', Arial, sans-serif;
+      line-height: 1;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-text .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .brand-text .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tab-logout {
+      background: #fee2e2;
+      color: #b91c1c;
+      border-color: #fca5a5;
+    }
+
+    .tab-logout:hover {
+      background: #fecaca;
+      box-shadow: none;
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: var(--theme-toggle-bg);
+      color: var(--theme-toggle-text);
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 16px rgba(15, 29, 64, 0.08);
+      margin-left: auto;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(21, 101, 216, 0.16);
+    }
+
+    .theme-toggle__icon {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .nav-tabs a {
+      text-decoration: none;
+    }
+
+    .tab {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      background: #f0f4ff;
+      box-shadow: 0 4px 12px rgba(47, 122, 227, 0.12);
+    }
+
+    .tab.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(47, 122, 227, 0.24);
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      background: #f0f4ff;
+      box-shadow: 0 4px 12px rgba(47, 122, 227, 0.12);
+    }
+
+    .btn.primary {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .btn.primary:hover {
+      background: #2563c7;
+      box-shadow: 0 6px 16px rgba(47, 122, 227, 0.24);
+    }
+
+    .study-form-toggle {
+      display: inline-flex;
+      gap: 6px;
+      background: var(--surface-strong);
+      border-radius: 14px;
+      padding: 5px;
+    }
+
+    .form-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .form-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(15, 29, 64, 0.08);
+    }
+
+    .admin-selector {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      align-items: center;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .admin-selector-group {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .week-toggle {
+      display: inline-flex;
+      gap: 10px;
+      background: var(--surface-strong);
+      border-radius: 16px;
+      padding: 6px;
+    }
+
+    .week-button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 12px 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .week-button.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 8px 20px rgba(15, 29, 64, 0.08);
+    }
+
+    .selector {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      min-width: 240px;
+      font-size: 0.98rem;
+      color: var(--text);
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' fill='%236b7794'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 10px 6px;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    body.theme-dark .selector {
+      background-color: var(--surface);
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .admin-table {
+      background: var(--surface);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .quick-fill-panel {
+      margin-bottom: 18px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface-strong);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr)) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .template-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .template-field label {
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .template-input,
+    .template-select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    .template-actions {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .template-status {
+      margin-top: 10px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    /* Переключатель дней — виден только на узких экранах */
+    .day-switcher {
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .day-switch-btn {
+      flex: 1;
+      min-width: 44px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.95rem;
+      font-family: inherit;
+      padding: 12px 8px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .day-switch-btn.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(47, 122, 227, 0.24);
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 110px repeat(6, minmax(150px, 1fr));
+      grid-auto-rows: auto;
+      gap: 20px 20px;
+      padding: 20px 28px 20px 8px;
+      align-items: start;
+      position: relative;
+      overflow-x: auto;
+    }
+
+    .admin-grid::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 100%;
+      background: var(--surface);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .grid-header {
+      padding: 16px 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: transparent;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .grid-header.time {
+      justify-content: flex-start;
+      color: transparent;
+      font-size: 0.95rem;
+    }
+
+    .time-cell {
+      padding: 0 0 0 28px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      position: relative;
+      margin-top: -27px;
+    }
+
+    .time-cell::before {
+      content: attr(data-time);
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 6px 6px;
+      border-radius: 32px;
+      box-shadow: 0 4px 14px rgba(21, 101, 216, 0.3);
+      min-width: 46px;
+      text-align: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .time-cell::after {
+      content: "";
+      position: absolute;
+      left: calc(28px + 50px + 6px);
+      top: 50%;
+      width: 9999px;
+      height: 1px;
+      border-top: 2px dashed rgba(15, 29, 64, 0.15);
+      transform: translateY(-50%);
+      z-index: 0;
+    }
+
+    body.theme-dark .time-cell::after {
+      border-top-color: rgba(154, 172, 205, 0.3);
+    }
+
+    .cell--admin {
+      background: #f3f5f9;
+      border: 1px solid #d5dbe7;
+      border-radius: 20px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 10px rgba(15, 29, 64, 0.06);
+      transition: all 0.2s ease;
+      min-height: 164px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .cell--admin:hover {
+      box-shadow: 0 8px 18px rgba(21, 101, 216, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .cell--admin.empty {
+      background: #f8f9fc;
+      border: 1px dashed #d9deea;
+    }
+
+    .cell--admin:nth-child(7n + 1) {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      min-height: unset;
+    }
+
+    .admin-cell-input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      width: 1px;
+      height: 1px;
+    }
+
+    .cell-lesson-type {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 6px 14px;
+      border-radius: 12px;
+      background: #2f7ae3;
+      color: #fff;
+      font-size: 0.92rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      line-height: 1;
+      min-height: 30px;
+      align-items: center;
+    }
+
+    .cell-lesson-type.type-practice {
+      background: #e53935;
+    }
+
+    .cell-lesson-subject {
+      font-size: 1.02rem;
+      line-height: 1.2;
+      font-weight: 800;
+      color: #06205f;
+      word-break: break-word;
+      min-height: 1.2em;
+    }
+
+    .cell-lesson-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: #0c2f73;
+      font-size: 0.98rem;
+      font-weight: 700;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .cell-lesson-meta-icon {
+      width: 18px;
+      min-width: 18px;
+      text-align: center;
+      margin-top: 1px;
+      opacity: 0.95;
+    }
+
+    .cell-lesson-meta-value {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .cell--admin.active-target {
+      border-color: #2f7ae3;
+      box-shadow: 0 0 0 3px rgba(31, 95, 204, 0.2), 0 8px 18px rgba(21, 101, 216, 0.14);
+      background: #eef4ff;
+    }
+
+    .cell--admin.multi-selected {
+      border-color: #0f8a5f;
+      box-shadow: 0 0 0 3px rgba(15, 138, 95, 0.16), 0 8px 18px rgba(15, 138, 95, 0.12);
+      background: #eefaf4;
+    }
+
+    body.theme-dark .cell--admin {
+      background: #1a253d;
+      border-color: rgba(154, 172, 205, 0.24);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    body.theme-dark .cell--admin.empty {
+      background: #162034;
+      border-style: dashed;
+    }
+
+    body.theme-dark .cell-lesson-subject,
+    body.theme-dark .cell-lesson-meta {
+      color: #d9e6ff;
+    }
+
+    body.theme-dark .cell--admin.active-target {
+      background: #253856;
+    }
+
+    body.theme-dark .cell--admin.multi-selected {
+      background: #173326;
+    }
+
+    .notice {
+      background: #def2ff;
+      border-left: 4px solid var(--blue);
+      padding: 12px 14px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      color: #0a4f7c;
+      font-size: 0.95rem;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .reference-panel {
+      margin-top: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .reference-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      user-select: none;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+
+    .reference-panel-header:hover {
+      background: var(--surface-strong);
+    }
+
+    .reference-panel-body {
+      padding: 20px 24px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ref-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .ref-tab {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .ref-tab.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .ref-add-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .ref-add-row .template-input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .ref-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 6px;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .ref-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface-strong);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      gap: 8px;
+    }
+
+    .ref-item span {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ref-del {
+      border: none;
+      background: transparent;
+      color: #ef4444;
+      font-size: 1.1rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .ref-del:hover {
+      background: #fee2e2;
+    }
+
+    .ref-empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 16px 0;
+      font-weight: 600;
+    }
+
+    .footer-notice {
+      margin-top: 22px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .kpi-footer {
+      margin-top: 44px;
+      background: #0a4f7c;
+      color: #f2f7ff;
+      padding: 36px 40px 42px;
+    }
+
+    .kpi-footer-inner {
+      max-width: 1800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 150px 1.35fr 1fr 1fr;
+      gap: 28px 40px;
+      align-items: start;
+    }
+
+    .kpi-footer-logo {
+      width: 120px;
+      height: 160px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .kpi-footer-logo img {
+      width: 120px;
+      height: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.9);
+    }
+
+    .kpi-footer-col {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .kpi-footer-col p {
+      margin: 0 0 18px;
+    }
+
+    .kpi-footer-col a {
+      color: #f2f7ff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .kpi-footer-col:last-child p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Модальное окно контактов */
+    .contact-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 29, 64, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .contact-modal-overlay.open {
+      display: flex;
+      animation: contactFade 0.2s ease;
+    }
+
+    @keyframes contactFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .contact-modal {
+      position: relative;
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 40px 32px 32px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 70px rgba(15, 29, 64, 0.35);
+      animation: contactPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes contactPop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .contact-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .contact-modal-close:hover {
+      background: var(--surface-strong);
+      color: var(--text);
+    }
+
+    .contact-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid var(--blue);
+      box-shadow: 0 10px 28px rgba(47, 122, 227, 0.35);
+      margin: 0 auto 18px;
+    }
+
+    .contact-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 72%;
+      transform: scale(1.4);
+      transform-origin: center 72%;
+    }
+
+    .contact-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .contact-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 16px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .contact-btn:hover {
+      background: #2563c7;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 960px) {
+      .day-switcher {
+        display: flex;
+      }
+
+      .admin-grid {
+        grid-template-columns: 88px 1fr;
+        overflow-x: hidden;
+      }
+
+      /* Показываем только выбранный день */
+      .admin-grid[data-mday="0"] [data-col]:not([data-col="0"]),
+      .admin-grid[data-mday="1"] [data-col]:not([data-col="1"]),
+      .admin-grid[data-mday="2"] [data-col]:not([data-col="2"]),
+      .admin-grid[data-mday="3"] [data-col]:not([data-col="3"]),
+      .admin-grid[data-mday="4"] [data-col]:not([data-col="4"]),
+      .admin-grid[data-mday="5"] [data-col]:not([data-col="5"]) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .admin-page {
+        padding: 16px 20px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .theme-toggle {
+        margin-left: 0;
+      }
+
+      .nav-tabs {
+        width: 100%;
+        gap: 8px;
+      }
+
+      .tab {
+        flex: 1;
+        text-align: center;
+      }
+
+      .btn {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      .selector {
+        min-width: 100%;
+      }
+
+      .admin-selector-group {
+        width: 100%;
+      }
+
+      .quick-fill-panel {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .template-actions {
+        grid-column: 1 / -1;
+        justify-content: stretch;
+      }
+
+      .kpi-footer-inner {
+        grid-template-columns: 120px 1fr;
+      }
+
+      .kpi-footer-logo {
+        grid-row: span 2;
+        width: 96px;
+        height: 140px;
+      }
+
+      .kpi-footer-logo img {
+        width: 96px;
+      }
+
+      .kpi-footer-col {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .admin-page {
+        padding: 16px 20px;
+      }
+
+      .topbar,
+      .nav-tabs {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .theme-toggle {
+        margin-left: 0;
+        justify-content: center;
+      }
+
+      .nav-tabs {
+        gap: 8px;
+      }
+
+      .tab {
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .selector {
+        min-width: 100%;
+      }
+
+      .admin-selector-group {
+        width: 100%;
+      }
+
+      .admin-grid {
+        padding: 20px 0;
+      }
+
+      .quick-fill-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .template-actions {
+        grid-column: auto;
+      }
+
+      .kpi-footer {
+        padding: 28px 20px 32px;
+      }
+
+      .kpi-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .kpi-footer-logo {
+        width: 84px;
+        height: auto;
+        grid-row: auto;
+      }
+
+      .kpi-footer-logo img {
+        width: 84px;
+      }
+
+      .kpi-footer-col {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo logo-kfu">КФУ</div>
+        <div class="brand-text">
+          <div class="title">Редактор расписания</div>
+          <div class="subtitle">админ-панель</div>
+        </div>
+      </div>
+      <div class="nav-tabs" aria-label="Навигация по разделам">
+        <button class="tab active" type="button">Расписание занятий</button>
+        <button class="tab" type="button">Расписание сессии</button>
+        <button class="tab" type="button">Расписание преподавателей</button>
+        <a href="/logout" class="tab tab-logout" style="text-decoration:none;">Выйти</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Переключить тему">
+        <span class="theme-toggle__icon">🌙</span>
+        <span class="theme-toggle__label">Тёмная тема</span>
+      </button>
+    </header>
+
+    <div class="admin-selector">
+      <div class="admin-selector-group">
+        <select id="facultySelect" class="selector" style="min-width:160px" onchange="filterAndPopulateGroups()">
+          <option value="">Все факультеты</option>
+        </select>
+        <div class="study-form-toggle" role="tablist">
+          <button class="form-btn active" type="button" data-form="очная" onclick="setAdminForm('очная')">Очная</button>
+          <button class="form-btn" type="button" data-form="заочная" onclick="setAdminForm('заочная')">Заочная</button>
+        </div>
+        <select id="groupSelect" class="selector" onchange="loadSchedule()"></select>
+        <button class="btn" type="button" onclick="addGroup()">Добавить группу</button>
+      </div>
+      <div class="week-toggle" role="tablist" aria-label="Переключить неделю">
+        <button class="week-button active" type="button" data-week="week1" onclick="setWeek('week1')">Первая неделя</button>
+        <button class="week-button" type="button" data-week="week2" onclick="setWeek('week2')">Вторая неделя</button>
+      </div>
+    </div>
+
+    <div class="admin-table">
+      <div class="quick-fill-panel">
+        <div class="template-field">
+          <label for="lessonTypeSelect">Тип занятия</label>
+          <select id="lessonTypeSelect" class="template-select">
+            <option value="Лекция">Лекция</option>
+            <option value="Практика">Практика</option>
+          </select>
+        </div>
+        <div class="template-field">
+          <label for="subjectInput">Предмет</label>
+          <input id="subjectInput" class="template-input" list="subjectOptions" placeholder="Выбери или введи предмет" />
+        </div>
+        <div class="template-field">
+          <label for="teacherInput">Преподаватель</label>
+          <input id="teacherInput" class="template-input" list="teacherOptions" placeholder="Выбери или введи преподавателя" />
+        </div>
+        <div class="template-field">
+          <label for="roomInput">Аудитория</label>
+          <input id="roomInput" class="template-input" list="roomOptions" placeholder="Например: 201" />
+        </div>
+        <div class="template-actions">
+          <button class="btn primary" type="button" onclick="applyTemplateToActiveCell()">Вставить в выбранные ячейки</button>
+          <button class="btn" type="button" onclick="clearActiveCell()">Очистить выбранные</button>
+        </div>
+      </div>
+      <datalist id="subjectOptions"></datalist>
+      <datalist id="teacherOptions"></datalist>
+      <datalist id="roomOptions"></datalist>
+      <div id="templateStatus" class="template-status">Выбери ячейку в сетке, затем нажми кнопку вставки.</div>
+      <div class="day-switcher" role="tablist" aria-label="Выбрать день">
+        <button class="day-switch-btn active" type="button" data-day="0" onclick="setAdminDay(0)">Пн</button>
+        <button class="day-switch-btn" type="button" data-day="1" onclick="setAdminDay(1)">Вт</button>
+        <button class="day-switch-btn" type="button" data-day="2" onclick="setAdminDay(2)">Ср</button>
+        <button class="day-switch-btn" type="button" data-day="3" onclick="setAdminDay(3)">Чт</button>
+        <button class="day-switch-btn" type="button" data-day="4" onclick="setAdminDay(4)">Пт</button>
+        <button class="day-switch-btn" type="button" data-day="5" onclick="setAdminDay(5)">Сб</button>
+      </div>
+      <div class="table-wrapper">
+        <div class="admin-grid" id="scheduleGrid" data-mday="0"></div>
+      </div>
+    </div>
+
+    <div class="reference-panel">
+      <div class="reference-panel-header" id="refPanelToggle" onclick="
+        const body = document.getElementById('refPanelBody');
+        const arrow = document.getElementById('refPanelArrow');
+        const open = body.style.display === 'none';
+        body.style.display = open ? 'block' : 'none';
+        arrow.textContent = open ? '▲' : '▼';
+      ">
+        <span>Справочники — предметы, преподаватели, аудитории</span>
+        <span id="refPanelArrow">▼</span>
+      </div>
+      <div class="reference-panel-body" id="refPanelBody" style="display:none">
+        <div class="ref-tabs">
+          <button class="ref-tab active" data-ref="subjects" onclick="setRefTab('subjects')">Предметы</button>
+          <button class="ref-tab" data-ref="teachers" onclick="setRefTab('teachers')">Преподаватели</button>
+          <button class="ref-tab" data-ref="rooms" onclick="setRefTab('rooms')">Аудитории</button>
+        </div>
+        <div class="ref-add-row">
+          <input type="text" id="refAddInput" class="template-input" placeholder="Введите название и нажмите Добавить">
+          <button class="btn primary" type="button" onclick="addRefItem()">Добавить</button>
+        </div>
+        <div id="refList" class="ref-list"></div>
+      </div>
+    </div>
+
+    <div class="footer-notice" style="margin-top: 20px; text-align: center;">
+      Данные сохраняются автоматически в базе данных.
+    </div>
+  </div>
+
+  <footer class="kpi-footer">
+    <div class="kpi-footer-inner">
+      <div class="kpi-footer-logo">
+        <div class="footer-kfu-logo">КФУ</div>
+      </div>
+
+      <div class="kpi-footer-col">
+        <p>
+          Крымский федеральный университет<br>
+          имени В.И. Вернадского © 1998–2026
+        </p>
+        <p>
+          Адрес: Россия, 295007, г. Симферополь, проспект Вернадского, 4
+        </p>
+      </div>
+
+      <div class="kpi-footer-col">
+        <p>
+          Разработчик — Кафедра информационных технологий
+        </p>
+        <p>
+          Создано в рамках проекта «Электронный кампус КФУ»
+        </p>
+      </div>
+
+      <div class="kpi-footer-col">
+        <p>О проекте</p>
+        <p><a href="#" onclick="openContactModal(event)">Контакты</a></p>
+        <p>
+          Использование материалов сайта только с обязательной ссылкой на
+          <a href="https://schedule.kfu.ru" target="_blank" rel="noopener noreferrer">schedule.kfu.ru</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="contact-modal-overlay" id="contactModal" onclick="closeContactModal(event)">
+    <div class="contact-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+      <button class="contact-modal-close" type="button" onclick="closeContactModal(event)" aria-label="Закрыть">×</button>
+      <div class="contact-avatar"><img class="contact-avatar-img" src="/avatar.jpg" alt="Автор" onerror="this.parentElement.style.display='none'"></div>
+      <div class="contact-name">Автор проекта</div>
+      <div class="contact-sub">Есть вопрос или предложение? Напишите мне в Telegram</div>
+      <a class="contact-btn" href="https://t.me/nemeusta" target="_blank" rel="noopener noreferrer">
+        Написать автору
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function openContactModal(event) {
+      if (event) event.preventDefault();
+      document.getElementById('contactModal').classList.add('open');
+    }
+
+    function closeContactModal(event) {
+      if (event) event.preventDefault();
+      document.getElementById('contactModal').classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeContactModal();
+    });
+
+    const THEME_STORAGE_KEY = 'kfu_schedule_theme';
+    const TEMPLATE_STORAGE_KEY = 'kfu_schedule_template';
+    const times = ['08:30', '10:25', '12:20', '14:15', '16:10', '18:20', '20:00'];
+    const days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+    const API_BASE = '/api';
+    const pendingSaves = new Map();
+
+    // Справочники загружаются из БД через API
+    let refData = { subjects: [], teachers: [], rooms: [], activeTab: 'subjects' };
+
+
+    // Загрузка справочников из БД
+    async function loadReferenceLists() {
+      try {
+        const [sRes, tRes, rRes] = await Promise.all([
+          fetch(`${API_BASE}/subjects`),
+          fetch(`${API_BASE}/teachers`),
+          fetch(`${API_BASE}/rooms`),
+        ]);
+        refData.subjects = (await sRes.json()).subjects || [];
+        refData.teachers = (await tRes.json()).teachers || [];
+        refData.rooms    = (await rRes.json()).rooms    || [];
+      } catch (e) {
+        console.error('Не удалось загрузить справочники из БД', e);
+      }
+      fillDatalist('subjectOptions', refData.subjects.map(s => s.name));
+      fillDatalist('teacherOptions', refData.teachers.map(t => t.name));
+      fillDatalist('roomOptions',    refData.rooms.map(r => r.name));
+      renderRefList();
+    }
+
+    // Управление справочниками
+    function setRefTab(tab) {
+      refData.activeTab = tab;
+      document.querySelectorAll('.ref-tab').forEach(b => b.classList.toggle('active', b.dataset.ref === tab));
+      document.getElementById('refAddInput').value = '';
+      renderRefList();
+    }
+
+    function renderRefList() {
+      const items = refData[refData.activeTab] || [];
+      const list = document.getElementById('refList');
+      if (!items.length) {
+        list.innerHTML = '<div class="ref-empty">Список пуст</div>';
+        return;
+      }
+      list.innerHTML = items.map(item =>
+        `<div class="ref-item">
+          <span>${escapeHtml(item.name)}</span>
+          <button class="ref-del" onclick="deleteRefItem(${item.id})" title="Удалить">×</button>
+        </div>`
+      ).join('');
+    }
+
+    async function addRefItem() {
+      const input = document.getElementById('refAddInput');
+      const name = input.value.trim();
+      if (!name) return;
+      const tab = refData.activeTab;
+      try {
+        const res = await fetch(`${API_BASE}/${tab}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        });
+        if (res.status === 409) { alert('Такая запись уже существует'); return; }
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        refData[tab].push({ id: data.id, name });
+        refData[tab].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+        fillDatalist(tab === 'subjects' ? 'subjectOptions' : tab === 'teachers' ? 'teacherOptions' : 'roomOptions',
+          refData[tab].map(x => x.name));
+        input.value = '';
+        renderRefList();
+      } catch { alert('Ошибка при добавлении'); }
+    }
+
+    async function deleteRefItem(id) {
+      const tab = refData.activeTab;
+      if (!confirm('Удалить запись?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/${tab}/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error();
+        refData[tab] = refData[tab].filter(x => x.id !== id);
+        fillDatalist(tab === 'subjects' ? 'subjectOptions' : tab === 'teachers' ? 'teacherOptions' : 'roomOptions',
+          refData[tab].map(x => x.name));
+        renderRefList();
+      } catch { alert('Ошибка при удалении'); }
+    }
+
+    let activeCellInput = null;
+    let selectedCellInputs = new Set();
+    const multiSelectMode = true;
+    let currentWeek = 'week1';
+
+    function fillDatalist(listId, items) {
+      const list = document.getElementById(listId);
+      list.innerHTML = '';
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        list.appendChild(option);
+      });
+    }
+
+    function collectPresetsFromSchedule(schedule) {
+      const subjects = new Set();
+      const teachers = new Set();
+
+      (schedule || []).forEach(row => {
+        (row || []).forEach(value => {
+          const lesson = (value || '').trim();
+          if (!lesson || lesson === 'Свободно' || lesson === 'Пары отсутствуют') {
+            return;
+          }
+
+          const withType = lesson.match(/^[^:]+:\s*([^()\-]+?)(?:\s*\(([^)]+)\))?(?:\s*[-,].*)?$/);
+          if (withType) {
+            const subject = withType[1].trim();
+            if (subject && !subject.toLowerCase().includes('элективная дисциплина')) {
+              subjects.add(subject);
+            }
+            if (withType[2]) {
+              teachers.add(withType[2].trim());
+            }
+            return;
+          }
+
+          const plain = lesson.match(/^([^()\-]+?)(?:\s*\(([^)]+)\))?(?:\s*[-,].*)?$/);
+          if (plain) {
+            const subject = plain[1].trim();
+            if (subject && !subject.toLowerCase().includes('элективная дисциплина')) {
+              subjects.add(subject);
+            }
+            if (plain[2]) {
+              teachers.add(plain[2].trim());
+            }
+          }
+        });
+      });
+
+      return {
+        subjects: Array.from(subjects),
+        teachers: Array.from(teachers)
+      };
+    }
+
+    function refreshTemplateListsFromSchedule() {
+      fillDatalist('subjectOptions', refData.subjects.map(s => s.name));
+      fillDatalist('teacherOptions', refData.teachers.map(t => t.name));
+      fillDatalist('roomOptions',    refData.rooms.map(r => r.name));
+    }
+
+    function setTemplateStatus(text) {
+      const status = document.getElementById('templateStatus');
+      status.textContent = text;
+    }
+
+    function readTemplateState() {
+      return {
+        lessonType: document.getElementById('lessonTypeSelect').value,
+        subject: document.getElementById('subjectInput').value,
+        teacher: document.getElementById('teacherInput').value,
+        room: document.getElementById('roomInput').value
+      };
+    }
+
+    function hasTemplateData() {
+      const template = readTemplateState();
+      return Boolean(template.lessonType.trim() || template.subject.trim() || template.teacher.trim() || template.room.trim());
+    }
+
+    function setTemplateState(template) {
+      document.getElementById('lessonTypeSelect').value = template.lessonType || 'Лекция';
+      document.getElementById('subjectInput').value = template.subject || '';
+      document.getElementById('teacherInput').value = template.teacher || '';
+      document.getElementById('roomInput').value = template.room || '';
+      saveTemplateState();
+    }
+
+    function saveTemplateState() {
+      localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(readTemplateState()));
+    }
+
+    function restoreTemplateState() {
+      const stored = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+      if (!stored) {
+        return;
+      }
+
+      try {
+        const template = JSON.parse(stored);
+        if (template.lessonType) document.getElementById('lessonTypeSelect').value = template.lessonType;
+        if (template.subject) document.getElementById('subjectInput').value = template.subject;
+        if (template.teacher) document.getElementById('teacherInput').value = template.teacher;
+        if (template.room) document.getElementById('roomInput').value = template.room;
+      } catch (err) {
+        localStorage.removeItem(TEMPLATE_STORAGE_KEY);
+      }
+    }
+
+    function wireTemplatePersistence() {
+      ['lessonTypeSelect', 'subjectInput', 'teacherInput', 'roomInput'].forEach(id => {
+        const element = document.getElementById(id);
+        element.addEventListener('input', saveTemplateState);
+        element.addEventListener('change', saveTemplateState);
+      });
+    }
+
+    function parseCellTemplateValue(rawValue) {
+      const original = (rawValue || '').trim();
+      if (!original) {
+        return {
+          lessonType: '',
+          subject: '',
+          teacher: '',
+          room: ''
+        };
+      }
+
+      const labeledMatch = original.match(/^([^:]+):\s*(.*?)\s*\|\|\s*Препод:\s*(.*?)\s*\|\|\s*Ауд\.?\s*:\s*(.*?)\s*$/i);
+      if (labeledMatch) {
+        return {
+          lessonType: labeledMatch[1].trim(),
+          subject: labeledMatch[2].trim(),
+          teacher: labeledMatch[3].trim(),
+          room: labeledMatch[4].trim()
+        };
+      }
+
+      let remaining = original;
+      let lessonType = '';
+      let teacher = '';
+      let room = '';
+
+      const typeMatch = remaining.match(/^([A-Za-zА-Яа-яЁё.\- ]{1,40})[:：]\s*(.+)$/);
+      if (typeMatch) {
+        lessonType = typeMatch[1].trim();
+        remaining = typeMatch[2].trim();
+      }
+
+      const roomMatch = remaining.match(/^(.*?)(?:\s[-–]\s|,\s*ауд\.\s*)(.+)$/i);
+      if (roomMatch) {
+        remaining = roomMatch[1].trim();
+        room = roomMatch[2].trim();
+      }
+
+      if (lessonType || room) {
+        const teacherMatch = remaining.match(/^(.*)\(([^()]+)\)\s*$/);
+        if (teacherMatch) {
+          remaining = teacherMatch[1].trim();
+          teacher = teacherMatch[2].trim();
+        }
+      }
+
+      return {
+        lessonType,
+        subject: remaining,
+        teacher,
+        room
+      };
+    }
+
+    function loadTemplateFromCellValue(rawValue) {
+      const template = parseCellTemplateValue(rawValue);
+      if (!template.subject && !template.teacher && !template.room && !template.lessonType) {
+        setTemplateState({ lessonType: 'Лекция', subject: '', teacher: '', room: '' });
+        setTemplateStatus('Ячейка пустая. Шаблон очищен.');
+        return;
+      }
+
+      setTemplateState({
+        lessonType: template.lessonType || 'Лекция',
+        subject: template.subject,
+        teacher: template.teacher,
+        room: template.room
+      });
+      setTemplateStatus('Данные ячейки перенесены наверх по отдельным полям: тип, предмет, препод, аудитория.');
+    }
+
+    function clearCellSelection() {
+      document.querySelectorAll('.cell--admin.active-target, .cell--admin.multi-selected').forEach(cell => {
+        cell.classList.remove('active-target', 'multi-selected');
+      });
+
+      selectedCellInputs.forEach(input => {
+        input.classList.remove('multi-selected', 'active-target');
+        const container = input.closest('.cell--admin');
+        if (container) {
+          container.classList.remove('multi-selected', 'active-target');
+        }
+      });
+      selectedCellInputs.clear();
+      activeCellInput = null;
+    }
+
+    function updateSelectionStatus() {
+      if (selectedCellInputs.size === 0) {
+        setTemplateStatus('Выбери ячейку в сетке, затем нажми кнопку вставки.');
+        return;
+      }
+
+      if (selectedCellInputs.size === 1) {
+        const input = selectedCellInputs.values().next().value;
+        const row = Number(input.dataset.row);
+        const col = Number(input.dataset.col);
+        const day = days[col] || `День ${col + 1}`;
+        const time = times[row] || `${row + 1} пара`;
+        setTemplateStatus(`Выбрана ячейка: ${day}, ${time}.`);
+        return;
+      }
+
+      setTemplateStatus(`Выбрано ячеек: ${selectedCellInputs.size}. Нажми вставку, чтобы применить одно значение ко всем.`);
+    }
+
+    function selectSingleCell(input, row, col) {
+      if (selectedCellInputs.size === 1 && selectedCellInputs.has(input)) {
+        activeCellInput = input;
+        input.classList.add('active-target');
+        const container = input.closest('.cell--admin');
+        if (container) {
+          container.classList.add('active-target');
+        }
+        updateSelectionStatus();
+        return;
+      }
+
+      clearCellSelection();
+      activeCellInput = input;
+      selectedCellInputs.add(input);
+      input.classList.add('active-target');
+      const container = input.closest('.cell--admin');
+      if (container) {
+        container.classList.add('active-target');
+      }
+      const day = days[col] || `День ${col + 1}`;
+      const time = times[row] || `${row + 1} пара`;
+      setTemplateStatus(`Выбрана ячейка: ${day}, ${time}.`);
+    }
+
+    function toggleCellSelection(input, row, col) {
+      const container = input.closest('.cell--admin');
+      if (selectedCellInputs.has(input)) {
+        selectedCellInputs.delete(input);
+        input.classList.remove('multi-selected', 'active-target');
+        if (container) {
+          container.classList.remove('multi-selected', 'active-target');
+        }
+        if (activeCellInput === input) {
+          activeCellInput = selectedCellInputs.values().next().value || null;
+        }
+      } else {
+        selectedCellInputs.add(input);
+        input.classList.add('multi-selected', 'active-target');
+        if (container) {
+          container.classList.add('multi-selected', 'active-target');
+        }
+        activeCellInput = input;
+      }
+
+      if (selectedCellInputs.size === 0) {
+        setTemplateState({ lessonType: 'Лекция', subject: '', teacher: '', room: '' });
+        setTemplateStatus('Выбери ячейку в сетке, затем нажми кнопку вставки.');
+        return;
+      }
+
+      const day = days[col] || `День ${col + 1}`;
+      const time = times[row] || `${row + 1} пара`;
+      const prefix = multiSelectMode && selectedCellInputs.size > 1 ? `Выбрано ячеек: ${selectedCellInputs.size}.` : `Выбрана ячейка: ${day}, ${time}.`;
+      setTemplateStatus(prefix + ' Нажми вставку, чтобы применить одно значение ко всем выбранным.' );
+    }
+
+    function setActiveCell(input, row, col) {
+      toggleCellSelection(input, row, col);
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderCellCard(input, cell) {
+      const parsed = parseCellTemplateValue(input.value);
+      const isEmpty = !input.value.trim();
+
+      cell.className = isEmpty ? 'cell--admin empty' : 'cell--admin';
+
+      let badge = parsed.lessonType || 'Лекция';
+      if (badge.length > 22) {
+        badge = badge.slice(0, 22).trim() + '…';
+      }
+
+      const subject = parsed.subject || 'Свободно';
+      const teacher = parsed.teacher || 'Не указан';
+      const room = parsed.room || 'Не указана';
+
+      if (selectedCellInputs.has(input)) {
+        cell.classList.add('active-target', 'multi-selected');
+      }
+
+      cell.innerHTML = `
+        <input type="text" class="admin-cell-input" data-row="${escapeHtml(input.dataset.row)}" data-col="${escapeHtml(input.dataset.col)}" value="${escapeHtml(input.value)}">
+        <div class="cell-lesson-type${/практика|пз|пр\b/i.test(parsed.lessonType) ? ' type-practice' : ''}">${escapeHtml(badge)}</div>
+        <div class="cell-lesson-subject">${escapeHtml(subject)}</div>
+        <div class="cell-lesson-meta">
+          <span class="cell-lesson-meta-icon">📚</span>
+          <span class="cell-lesson-meta-value">${escapeHtml(teacher)}</span>
+        </div>
+        <div class="cell-lesson-meta">
+          <span class="cell-lesson-meta-icon">📍</span>
+          <span class="cell-lesson-meta-value">${escapeHtml(room)}</span>
+        </div>
+      `;
+
+      return cell.querySelector('.admin-cell-input');
+    }
+
+    function getSelectedWeekKey() {
+      return currentWeek;
+    }
+
+    function setWeek(weekKey) {
+      currentWeek = weekKey;
+      document.querySelectorAll('.week-button').forEach(button => {
+        button.classList.toggle('active', button.dataset.week === weekKey);
+      });
+      clearCellSelection();
+      updateSelectionStatus();
+      setTemplateStatus('Выбери ячейку в сетке, затем нажми кнопку вставки.');
+      loadSchedule();
+    }
+
+    function setAdminDay(day) {
+      document.querySelectorAll('.day-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.day === String(day)));
+      document.getElementById('scheduleGrid').setAttribute('data-mday', String(day));
+    }
+
+    let allAdminGroups = [];
+    let adminStudyForm = 'очная';
+
+    const DEGREE_ORDER = { 'бакалавриат': 0, 'специалитет': 1, 'магистратура': 2, 'аспирантура': 3 };
+    const DEGREE_LABELS_ADMIN = { 'бакалавриат': 'Бакалавриат', 'специалитет': 'Специалитет', 'магистратура': 'Магистратура', 'аспирантура': 'Аспирантура' };
+
+    function setAdminForm(form) {
+      adminStudyForm = form;
+      document.querySelectorAll('.form-btn').forEach(b => b.classList.toggle('active', b.dataset.form === form));
+      filterAndPopulateGroups();
+    }
+
+    function filterAndPopulateGroups(selectedGroup) {
+      const facultyId = document.getElementById('facultySelect').value;
+      const select = document.getElementById('groupSelect');
+      const prevVal = selectedGroup || select.value;
+
+      let filtered = allAdminGroups.filter(g => (g.study_form || 'очная') === adminStudyForm);
+      if (facultyId) filtered = filtered.filter(g => String(g.faculty_id) === facultyId);
+
+      const byCourse = {};
+      filtered.forEach(g => {
+        const course = g.course || 0;
+        const degree = g.degree || 'бакалавриат';
+        const key = `${DEGREE_ORDER[degree] ?? 9}_${String(course).padStart(2, '0')}`;
+        if (!byCourse[key]) byCourse[key] = { course, degree, names: [] };
+        byCourse[key].names.push(g.name);
+      });
+
+      select.innerHTML = '';
+      Object.keys(byCourse).sort().forEach(key => {
+        const { course, degree, names } = byCourse[key];
+        const og = document.createElement('optgroup');
+        og.label = `${course > 0 ? course + ' курс' : 'Другие'} — ${DEGREE_LABELS_ADMIN[degree] || degree}`;
+        names.sort().forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name; opt.textContent = name;
+          og.appendChild(opt);
+        });
+        select.appendChild(og);
+      });
+
+      if (prevVal && [...select.options].some(o => o.value === prevVal)) select.value = prevVal;
+    }
+
+    async function populateGroupSelect(selectedGroup) {
+      try {
+        const [fRes, gRes] = await Promise.all([
+          fetch(`${API_BASE}/faculties`),
+          fetch(`${API_BASE}/groups`)
+        ]);
+        const facData = await fRes.json();
+        const grpData = await gRes.json();
+
+        allAdminGroups = (grpData.groups || []).map(g =>
+          typeof g === 'string' ? { name: g, study_form: 'очная', course: 0, degree: 'бакалавриат', faculty_id: null } : g
+        );
+
+        const facSelect = document.getElementById('facultySelect');
+        facSelect.innerHTML = '<option value="">Все факультеты</option>';
+        (facData.faculties || []).forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.id; opt.textContent = f.short_name || f.name;
+          facSelect.appendChild(opt);
+        });
+
+        filterAndPopulateGroups(selectedGroup);
+      } catch (err) {
+        alert('Не удалось подключиться к API. Запусти app.py и перезагрузи страницу.');
+      }
+    }
+
+    async function addGroup() {
+      const groupName = prompt('Введите название новой группы:');
+      if (!groupName) return;
+
+      const trimmed = groupName.trim();
+      if (!trimmed) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/groups`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: trimmed })
+        });
+
+        if (!response.ok) {
+          const errorPayload = await response.json().catch(() => ({}));
+          throw new Error(errorPayload.error || 'Не удалось добавить группу');
+        }
+
+        await populateGroupSelect(trimmed);
+        await loadSchedule();
+      } catch (err) {
+        alert(`Ошибка при добавлении группы: ${err.message}`);
+      }
+    }
+
+    async function fetchSchedule(group, weekKey) {
+      const url = `${API_BASE}/schedule?group=${encodeURIComponent(group)}&week=${encodeURIComponent(weekKey)}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Не удалось загрузить расписание');
+      }
+      const payload = await response.json();
+      return payload.rows || [];
+    }
+
+    function renderGrid(schedule, group, weekKey) {
+      const grid = document.getElementById('scheduleGrid');
+      grid.innerHTML = '';
+
+      const timeHeader = document.createElement('div');
+      timeHeader.className = 'grid-header time';
+      timeHeader.textContent = 'Время';
+      grid.appendChild(timeHeader);
+
+      days.forEach((day, di) => {
+        const header = document.createElement('div');
+        header.className = 'grid-header';
+        header.textContent = day;
+        header.setAttribute('data-col', String(di));
+        grid.appendChild(header);
+      });
+
+      for (let row = 0; row < times.length; row++) {
+        const timeCell = document.createElement('div');
+        timeCell.className = 'time-cell';
+        timeCell.setAttribute('data-time', times[row]);
+        grid.appendChild(timeCell);
+
+        for (let col = 0; col < 6; col++) {
+          const value = (schedule[row] && schedule[row][col]) ? schedule[row][col] : '';
+          const cell = document.createElement('div');
+          cell.className = value ? 'cell--admin' : 'cell--admin empty';
+          cell.setAttribute('data-col', String(col));
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'admin-cell-input';
+          input.value = value;
+          input.placeholder = 'Введите пару';
+          input.dataset.row = String(row);
+          input.dataset.col = String(col);
+
+          let hiddenInput = renderCellCard(input, cell);
+
+          const bindHiddenInputListener = () => {
+            hiddenInput.addEventListener('input', function onCellInput() {
+              updateCell(this, group, weekKey);
+              hiddenInput = renderCellCard(this, cell);
+              bindHiddenInputListener();
+            });
+          };
+
+          cell.addEventListener('click', function() {
+            if (hiddenInput.value.trim()) {
+              loadTemplateFromCellValue(hiddenInput.value);
+            }
+
+            if (multiSelectMode) {
+              toggleCellSelection(hiddenInput, row, col);
+            } else {
+              setActiveCell(hiddenInput, row, col);
+            }
+          });
+
+          bindHiddenInputListener();
+
+          grid.appendChild(cell);
+        }
+      }
+    }
+
+    function buildTemplateValue() {
+      const lessonType = document.getElementById('lessonTypeSelect').value.trim();
+      const subject = document.getElementById('subjectInput').value.trim();
+      const teacher = document.getElementById('teacherInput').value.trim();
+      const room = document.getElementById('roomInput').value.trim();
+
+      if (!subject) {
+        return '';
+      }
+
+      return `${lessonType}: ${subject} || Препод: ${teacher || '—'} || Ауд.: ${room || '—'}`;
+    }
+
+    async function checkTeacherConflicts(targets, teacher, group) {
+      const checkedRows = new Set();
+      const conflicts = [];
+      for (const input of targets) {
+        const row = input.dataset.row;
+        if (checkedRows.has(row)) continue;
+        checkedRows.add(row);
+        try {
+          const params = new URLSearchParams({ teacher, week: currentWeek, row, group });
+          const res = await fetch(`${API_BASE}/check-conflict?${params}`);
+          if (res.ok) {
+            const data = await res.json();
+            conflicts.push(...(data.conflicts || []));
+          }
+        } catch { /* игнорируем ошибку сети */ }
+      }
+      return conflicts;
+    }
+
+    async function checkLocationConflicts(targets, room, group) {
+      if (!room || room === '—' || room === '-') return [];
+      const checkedRows = new Set();
+      const conflicts = [];
+      for (const input of targets) {
+        const row = input.dataset.row;
+        if (checkedRows.has(row)) continue;
+        checkedRows.add(row);
+        try {
+          const params = new URLSearchParams({ room, week: currentWeek, row, group });
+          const res = await fetch(`${API_BASE}/check-location-conflict?${params}`);
+          if (res.ok) {
+            const data = await res.json();
+            conflicts.push(...(data.conflicts || []));
+          }
+        } catch { /* игнорируем ошибку сети */ }
+      }
+      return conflicts;
+    }
+
+    async function applyTemplateToActiveCell() {
+      const targets = selectedCellInputs.size > 0 ? Array.from(selectedCellInputs) : (activeCellInput ? [activeCellInput] : []);
+      if (!targets.length) {
+        alert('Сначала выбери ячейку расписания.');
+        return;
+      }
+
+      const value = buildTemplateValue();
+      if (!value) {
+        alert('Выбери предмет или введи его вручную.');
+        return;
+      }
+
+      const teacher = document.getElementById('teacherInput').value.trim();
+      const room    = document.getElementById('roomInput').value.trim();
+      const group   = document.getElementById('groupSelect').value;
+      const warnings = [];
+
+      // Проверка конфликта преподавателя (все типы занятий)
+      if (teacher && teacher !== '—') {
+        const tc = await checkTeacherConflicts(targets, teacher, group);
+        if (tc.length > 0) {
+          const groups = [...new Set(tc.map(c => c.group))].join(', ');
+          warnings.push(`Преподаватель "${teacher}" уже ведёт занятие в это время у группы: ${groups}.`);
+        }
+      }
+
+      // Проверка конфликта адреса (следующая/предыдущая пара в другом корпусе)
+      if (room && room !== '—') {
+        const lc = await checkLocationConflicts(targets, room, group);
+        if (lc.length > 0) {
+          lc.forEach(c => {
+            warnings.push(`${c.direction === 'предыдущая пара' ? 'Предыдущая' : 'Следующая'} пара (${c.time}) у группы проходит в другом корпусе: ${c.room}.`);
+          });
+        }
+      }
+
+      if (warnings.length > 0) {
+        const ok = confirm(`⚠️ Внимание!\n\n${warnings.join('\n\n')}\n\nВсё равно сохранить?`);
+        if (!ok) return;
+      }
+
+      targets.forEach(input => {
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      clearCellSelection();
+      setTemplateState({ lessonType: 'Лекция', subject: '', teacher: '', room: '' });
+      setTemplateStatus(targets.length > 1 ? `Запись вставлена и сохранена в ${targets.length} ячейках. Выборка очищена.` : 'Запись вставлена и сохранена в базу. Выборка очищена.');
+    }
+
+    function clearActiveCell() {
+      const targets = selectedCellInputs.size > 0 ? Array.from(selectedCellInputs) : (activeCellInput ? [activeCellInput] : []);
+      if (!targets.length) {
+        alert('Сначала выбери ячейку расписания.');
+        return;
+      }
+
+      // Сначала сбрасываем выделение — до ре-рендера ячеек,
+      // иначе selectedCellInputs будет содержать устаревшие DOM-узлы
+      clearCellSelection();
+
+      targets.forEach(input => {
+        input.value = '';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      setTemplateStatus(targets.length > 1 ? `Ячейки очищены и сохранены в ${targets.length} позициях.` : 'Ячейка очищена и сохранена в базу.');
+    }
+
+    function applyTheme(theme) {
+      const isDark = theme === 'dark';
+      document.body.classList.toggle('theme-dark', isDark);
+      document.documentElement.classList.toggle('theme-dark', isDark);
+
+      const toggleButton = document.getElementById('theme-toggle');
+      if (!toggleButton) {
+        return;
+      }
+
+      const icon = toggleButton.querySelector('.theme-toggle__icon');
+      const label = toggleButton.querySelector('.theme-toggle__label');
+      toggleButton.setAttribute('aria-pressed', String(isDark));
+
+      if (icon) {
+        icon.textContent = isDark ? '☀️' : '🌙';
+      }
+      if (label) {
+        label.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+      }
+    }
+
+    function initThemeToggle() {
+      const toggleButton = document.getElementById('theme-toggle');
+      if (!toggleButton) {
+        return;
+      }
+
+      const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialTheme = storedTheme || (prefersDark ? 'dark' : 'light');
+      applyTheme(initialTheme);
+
+      toggleButton.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('theme-dark') ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      });
+    }
+
+    async function loadSchedule() {
+      const group = document.getElementById('groupSelect').value;
+      const weekKey = getSelectedWeekKey();
+      if (!group) return;
+
+      try {
+        clearCellSelection();
+        const schedule = await fetchSchedule(group, weekKey);
+        refreshTemplateListsFromSchedule(schedule);
+        renderGrid(schedule, group, weekKey);
+        updateSelectionStatus();
+      } catch (err) {
+        alert('Ошибка загрузки расписания. Проверь, что API запущен.');
+      }
+    }
+
+    function updateCell(input, group, weekKey) {
+      const row = parseInt(input.dataset.row, 10);
+      const col = parseInt(input.dataset.col, 10);
+      const value = input.value;
+      const key = `${group}:${weekKey}:${row}:${col}`;
+
+      const previousTimer = pendingSaves.get(key);
+      if (previousTimer) {
+        clearTimeout(previousTimer);
+      }
+
+      const timer = setTimeout(async () => {
+        try {
+          const response = await fetch(`${API_BASE}/schedule/cell`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              group,
+              week: weekKey,
+              row,
+              col,
+              value
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Не удалось сохранить изменение');
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          pendingSaves.delete(key);
+        }
+      }, 280);
+
+      pendingSaves.set(key, timer);
+    }
+
+    async function initializeAdmin() {
+      initThemeToggle();
+      setTemplateStatus('Множественный выбор включён по умолчанию. Выбирай несколько ячеек и нажимай вставку.');
+      setTemplateState({ lessonType: 'Лекция', subject: '', teacher: '', room: '' });
+      restoreTemplateState();
+      wireTemplatePersistence();
+      saveTemplateState();
+      await Promise.all([populateGroupSelect(), loadReferenceLists()]);
+      await loadSchedule();
+    }
+
+    initializeAdmin();
+  </script>
+</body>
+</html>

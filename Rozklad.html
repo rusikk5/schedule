@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Расписание КФУ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7ff;
+      --surface: #ffffff;
+      --surface-strong: #eef1fc;
+      --text: #0f1d40;
+      --muted: #6b7794;
+      --blue: #2f7ae3;
+      --blue-soft: #dee7ff;
+      --border: rgba(15, 29, 64, 0.08);
+      --shadow: 0 24px 60px rgba(15, 29, 64, 0.08);
+      --theme-toggle-bg: #ffffff;
+      --theme-toggle-text: #0f1d40;
+      font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: #eef2ff;
+    }
+
+    html.theme-dark {
+      background: #111d34;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f9fbff 0%, #eef2ff 100%);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body.theme-dark {
+      --bg: #0d1424;
+      --surface: #151f34;
+      --surface-strong: #1f2b44;
+      --text: #e5edff;
+      --muted: #9cadcd;
+      --blue: #4b8af2;
+      --blue-soft: #243553;
+      --border: rgba(154, 172, 205, 0.24);
+      --shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+      --theme-toggle-bg: #22304b;
+      --theme-toggle-text: #f0f5ff;
+      background: linear-gradient(180deg, #0f172a 0%, #111d34 100%);
+    }
+
+    .page {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 24px 40px 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 18px 30px rgba(15, 29, 64, 0.12);
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .logo-kfu {
+      background: linear-gradient(135deg, #2563c7 0%, #2f7ae3 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.95rem;
+      font-family: 'Nunito', Arial, sans-serif;
+      display: grid;
+      place-items: center;
+    }
+
+    .footer-kfu-logo {
+      color: rgba(255,255,255,0.9);
+      font-weight: 900;
+      font-size: 2.2rem;
+      font-family: 'Nunito', Arial, sans-serif;
+      line-height: 1;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-text .title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .brand-text .subtitle {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: var(--theme-toggle-bg);
+      color: var(--theme-toggle-text);
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 16px rgba(15, 29, 64, 0.08);
+      margin-left: auto;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(21, 101, 216, 0.16);
+    }
+
+    .theme-toggle__icon {
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .tab {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 10px 18px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.95rem;
+      font-family: inherit;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab:hover {
+      background: #f0f4ff;
+      box-shadow: 0 4px 12px rgba(47, 122, 227, 0.12);
+    }
+
+    .tab.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(47, 122, 227, 0.24);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      align-items: center;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .study-form-toggle {
+      display: inline-flex;
+      gap: 6px;
+      background: var(--surface-strong);
+      border-radius: 14px;
+      padding: 5px;
+    }
+
+    .form-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: inherit;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .form-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(15, 29, 64, 0.08);
+    }
+
+    .selector {
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      min-width: 240px;
+      appearance: none;
+      font-size: 0.98rem;
+      color: var(--text);
+      background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' fill='%236b7794'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 10px 6px;
+      cursor: pointer;
+    }
+
+    body.theme-dark .selector {
+      background-color: var(--surface);
+    }
+
+    .week-toggle {
+      display: inline-flex;
+      gap: 10px;
+      background: var(--surface-strong);
+      border-radius: 16px;
+      padding: 6px;
+    }
+
+    .week-button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.95rem;
+      font-family: inherit;
+      padding: 12px 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .week-button.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 8px 20px rgba(15, 29, 64, 0.08);
+    }
+
+    /* Переключатель дней — виден только на узких экранах */
+    .day-switcher {
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .day-switch-btn {
+      flex: 1;
+      min-width: 44px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.95rem;
+      font-family: inherit;
+      padding: 12px 8px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .day-switch-btn.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 6px 16px rgba(47, 122, 227, 0.24);
+    }
+
+    .schedule-card {
+      background: var(--surface);
+      border-radius: 28px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: 110px repeat(6, minmax(150px, 1fr));
+      grid-auto-rows: auto;
+      gap: 20px 20px;
+      padding: 0 28px 0 8px;
+      align-items: start;
+      position: relative;
+      overflow-x: auto;
+    }
+
+    .schedule-grid::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 100%;
+      background: var(--surface);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .schedule-header {
+      padding: 32px 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+
+    .schedule-header.day {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    .schedule-header.time {
+      justify-content: flex-start;
+      color: transparent;
+      font-size: 0.95rem;
+    }
+
+    .schedule-row {
+      display: contents;
+    }
+
+    .time-cell {
+      padding: 0 0 0 28px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      position: relative;
+      margin-top: -27px;
+    }
+
+    .time-cell::before {
+      content: attr(data-time);
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 6px 6px;
+      border-radius: 32px;
+      box-shadow: 0 4px 14px rgba(21, 101, 216, 0.3);
+      min-width: 46px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .time-cell::after {
+      content: "";
+      position: absolute;
+      left: calc(28px + 50px + 6px);
+      top: 50%;
+      width: 9999px;
+      height: 1px;
+      border-top: 2px dashed rgba(15, 29, 64, 0.15);
+      transform: translateY(-50%);
+      z-index: 0;
+    }
+
+    body.theme-dark .time-cell::after {
+      border-top-color: rgba(154, 172, 205, 0.3);
+    }
+
+    .time-cell::before {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cell--empty {
+      background: transparent;
+      box-shadow: none;
+      min-height: 110px;
+    }
+
+    .cell {
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(15, 29, 64, 0.08);
+      transition: all 0.2s ease;
+      min-height: 110px;
+      min-width: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Время в углу карточки — видно только на мобильной раскладке */
+    .cell-time {
+      display: none;
+    }
+
+    /* Заглушка "окна" (пропущенной пары) на десктопе выглядит как пустое место */
+    .cell-gap {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .cell-gap .cell-time,
+    .cell-gap .gap-label {
+      display: none;
+    }
+
+    body.theme-dark .cell {
+      background: var(--surface-strong);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .cell:nth-child(7n + 1) {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      min-height: unset;
+    }
+
+    .cell:nth-child(7n + 2):hover,
+    .cell:nth-child(7n + 3):hover,
+    .cell:nth-child(7n + 4):hover,
+    .cell:nth-child(7n + 5):hover,
+    .cell:nth-child(7n + 6):hover,
+    .cell:nth-child(7n + 7):hover {
+      box-shadow: 0 6px 16px rgba(21, 101, 216, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .lesson {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      text-align: left;
+      padding: 0;
+      color: var(--text);
+      font-weight: 600;
+      gap: 6px;
+      font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: auto;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .lesson-badge {
+      display: inline-block;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: capitalize;
+      letter-spacing: 0.3px;
+      font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      align-self: flex-start;
+    }
+
+    .lesson-badge.lecture {
+      background: #2f7ae3;
+      color: #fff;
+    }
+
+    .lesson-badge.practice {
+      background: #e53935;
+      color: #fff;
+    }
+
+    .lesson-badge.lab {
+      background: #00B4D8;
+      color: #fff;
+    }
+
+    .lesson-badge.seminar {
+      background: #FFA500;
+      color: #fff;
+    }
+
+    .lesson-badge.consultation {
+      background: #6B7794;
+      color: #fff;
+    }
+
+    .lesson-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+      line-height: 1.25;
+      width: 100%;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+    }
+
+    .lesson-teacher {
+      font-size: 0.8rem;
+      color: var(--text);
+      font-weight: 600;
+      margin: 4px 0 0 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      width: 100%;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .lesson-teacher::before {
+      content: "👤";
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .lesson-room {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin: 4px 0 0 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      width: 100%;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .lesson-room::before {
+      content: "📍";
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    .footer-notice {
+      margin-top: 22px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .kpi-footer {
+      margin-top: 44px;
+      background: #0a4f7c;
+      color: #f2f7ff;
+      padding: 36px 40px 42px;
+    }
+
+    .kpi-footer-inner {
+      max-width: 1800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 150px 1.35fr 1fr 1fr;
+      gap: 28px 40px;
+      align-items: start;
+    }
+
+    .kpi-footer-logo {
+      width: 120px;
+      height: 160px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .kpi-footer-logo img {
+      width: 120px;
+      height: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1) opacity(0.9);
+    }
+
+    .kpi-footer-col {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    .kpi-footer-col p {
+      margin: 0 0 18px;
+    }
+
+    .kpi-footer-col a {
+      color: #f2f7ff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .kpi-footer-col:last-child p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Модальное окно контактов */
+    .contact-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 29, 64, 0.55);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .contact-modal-overlay.open {
+      display: flex;
+      animation: contactFade 0.2s ease;
+    }
+
+    @keyframes contactFade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .contact-modal {
+      position: relative;
+      background: var(--surface);
+      border-radius: 28px;
+      padding: 40px 32px 32px;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 30px 70px rgba(15, 29, 64, 0.35);
+      animation: contactPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes contactPop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .contact-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.6rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .contact-modal-close:hover {
+      background: var(--surface-strong);
+      color: var(--text);
+    }
+
+    .contact-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid var(--blue);
+      box-shadow: 0 10px 28px rgba(47, 122, 227, 0.35);
+      margin: 0 auto 18px;
+    }
+
+    .contact-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 72%;
+      transform: scale(1.4);
+      transform-origin: center 72%;
+    }
+
+    .contact-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .contact-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 16px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .contact-btn:hover {
+      background: #2563c7;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 960px) {
+      .day-switcher {
+        display: flex;
+      }
+
+      /* Мобильный режим: обычные блоки с margin auto — каждая карточка строго по центру */
+      .schedule-card {
+        overflow: visible;
+      }
+
+      .schedule-grid {
+        display: block;
+        overflow: visible;
+        padding: 18px 16px;
+      }
+
+      /* Показываем только выбранный день */
+      .schedule-grid[data-mday="0"] [data-col]:not([data-col="0"]),
+      .schedule-grid[data-mday="1"] [data-col]:not([data-col="1"]),
+      .schedule-grid[data-mday="2"] [data-col]:not([data-col="2"]),
+      .schedule-grid[data-mday="3"] [data-col]:not([data-col="3"]),
+      .schedule-grid[data-mday="4"] [data-col]:not([data-col="4"]),
+      .schedule-grid[data-mday="5"] [data-col]:not([data-col="5"]) {
+        display: none;
+      }
+
+      /* Колонка времени, заголовок "Время" и пустые слоты скрыты */
+      .schedule-header.time,
+      .time-cell,
+      .cell--empty {
+        display: none;
+      }
+
+      /* Карточка пары — блок по центру контейнера */
+      .cell {
+        display: block;
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 14px;
+      }
+
+      /* Заголовок дня — тоже по центру */
+      .schedule-header.day {
+        display: block;
+        text-align: center;
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto 16px;
+      }
+
+      /* Заглушка "окна" между парами — приглушённая карточка с пунктиром */
+      .cell-gap {
+        background: var(--surface);
+        border: 2px dashed var(--border);
+        box-shadow: none;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 340px;
+        margin: 0 auto 14px;
+      }
+
+      .cell-gap .cell-time,
+      .cell-gap .gap-label {
+        display: block;
+      }
+
+      .cell-gap .gap-label {
+        color: var(--muted);
+        font-weight: 700;
+        font-size: 1rem;
+      }
+
+      /* Бейдж времени в правом верхнем углу карточки */
+      .cell-time {
+        display: inline-block;
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: var(--blue);
+        color: #fff;
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 4px 11px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(21, 101, 216, 0.3);
+        z-index: 2;
+      }
+
+      /* Чтобы бейдж типа не залезал под время */
+      .lesson-badge {
+        max-width: calc(100% - 70px);
+      }
+
+      .kpi-footer-inner {
+        grid-template-columns: 120px 1fr;
+      }
+
+      .kpi-footer-logo {
+        grid-row: span 2;
+        width: 96px;
+      }
+
+      .kpi-footer-logo img {
+        width: 96px;
+      }
+
+      .kpi-footer-col {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 16px 14px 28px;
+      }
+
+      .topbar,
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .topbar {
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+
+      .theme-toggle {
+        margin-left: 0;
+        justify-content: center;
+      }
+
+      /* Вкладки разделов — в ряд, растянуты по ширине */
+      .nav-tabs {
+        justify-content: stretch;
+        gap: 6px;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 10px 10px;
+        font-size: 0.8rem;
+        white-space: normal;
+        text-align: center;
+      }
+
+      /* Контролы: факультет, форма, группа — каждый на всю ширину */
+      .controls {
+        padding: 16px;
+        border-radius: 18px;
+        gap: 12px;
+      }
+
+      .controls-left {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 12px;
+      }
+
+      .selector {
+        min-width: 0 !important;
+        width: 100%;
+      }
+
+      .study-form-toggle,
+      .week-toggle {
+        width: 100%;
+      }
+
+      .form-btn,
+      .week-button {
+        flex: 1;
+        text-align: center;
+      }
+
+      .schedule-card {
+        border-radius: 18px;
+      }
+
+      .schedule-header.day {
+        font-size: 1rem;
+      }
+
+      .cell {
+        padding: 16px 14px;
+      }
+
+      .lesson-title {
+        font-size: 1rem;
+      }
+
+      .kpi-footer {
+        padding: 28px 20px 32px;
+      }
+
+      .kpi-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .kpi-footer-logo {
+        width: 84px;
+        height: auto;
+      }
+
+      .kpi-footer-logo img {
+        width: 84px;
+      }
+
+      .kpi-footer-col {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo logo-kfu">КФУ</div>
+        <div class="brand-text">
+          <div class="title">Расписание</div>
+          <div class="subtitle">кафедра / группа / сессия</div>
+        </div>
+      </div>
+      <div class="nav-tabs">
+        <button class="tab active" data-schedule-type="study">Расписание занятий</button>
+        <button class="tab" data-schedule-type="session">Расписание сессии</button>
+        <button class="tab" data-schedule-type="teachers">Расписание преподавателей</button>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Переключить тему">
+        <span class="theme-toggle__icon">🌙</span>
+        <span class="theme-toggle__label">Тёмная тема</span>
+      </button>
+    </header>
+
+    <section class="controls">
+      <div class="controls-left">
+        <select id="faculty-select" class="selector" aria-label="Выберите факультет" style="min-width:180px">
+          <option value="">Все факультеты</option>
+        </select>
+        <div class="study-form-toggle" role="tablist" aria-label="Форма обучения">
+          <button class="form-btn active" type="button" data-form="очная">Очная</button>
+          <button class="form-btn" type="button" data-form="заочная">Заочная</button>
+        </div>
+        <select id="group-select" class="selector" aria-label="Выберите группу"></select>
+      </div>
+      <div class="week-toggle" role="tablist" aria-label="Переключить неделю">
+        <button class="week-button active" type="button" data-week="week1">Первая неделя</button>
+        <button class="week-button" type="button" data-week="week2">Вторая неделя</button>
+      </div>
+    </section>
+
+    <div class="day-switcher" role="tablist" aria-label="Выбрать день">
+      <button class="day-switch-btn active" type="button" data-day="0">Пн</button>
+      <button class="day-switch-btn" type="button" data-day="1">Вт</button>
+      <button class="day-switch-btn" type="button" data-day="2">Ср</button>
+      <button class="day-switch-btn" type="button" data-day="3">Чт</button>
+      <button class="day-switch-btn" type="button" data-day="4">Пт</button>
+      <button class="day-switch-btn" type="button" data-day="5">Сб</button>
+    </div>
+
+    <article class="schedule-card">
+      <div class="schedule-grid" data-mday="0"></div>
+    </article>
+
+    <div class="footer-notice">
+      Данные актуальны на текущий учебный семестр. По вопросам обращайтесь в учебную часть.
+    </div>
+  </div>
+
+  <footer class="kpi-footer">
+    <div class="kpi-footer-inner">
+      <div class="kpi-footer-logo">
+        <div class="footer-kfu-logo">КФУ</div>
+      </div>
+
+      <div class="kpi-footer-col">
+        <p>
+          Крымский федеральный университет<br>
+          имени В.И. Вернадского © 1998–2026
+        </p>
+        <p>
+          Адрес: Россия, 295007, г. Симферополь, проспект Вернадского, 4
+        </p>
+      </div>
+
+      <div class="kpi-footer-col">
+        <p>
+          Разработчик — Кафедра информационных технологий
+        </p>
+        <p>
+          Создано в рамках проекта «Электронный кампус КФУ»
+        </p>
+      </div>
+
+      <div class="kpi-footer-col">
+        <p>О проекте</p>
+        <p><a href="#" onclick="openContactModal(event)">Контакты</a></p>
+        <p>
+          Использование материалов сайта только с обязательной ссылкой на
+          <a href="https://schedule.kfu.ru" target="_blank" rel="noopener noreferrer">schedule.kfu.ru</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="contact-modal-overlay" id="contactModal" onclick="closeContactModal(event)">
+    <div class="contact-modal" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+      <button class="contact-modal-close" type="button" onclick="closeContactModal(event)" aria-label="Закрыть">×</button>
+      <div class="contact-avatar"><img class="contact-avatar-img" src="/avatar.jpg" alt="Автор" onerror="this.parentElement.style.display='none'"></div>
+      <div class="contact-name">Автор проекта</div>
+      <div class="contact-sub">Есть вопрос или предложение? Напишите мне в Telegram</div>
+      <a class="contact-btn" href="https://t.me/nemeusta" target="_blank" rel="noopener noreferrer">
+        Написать автору
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function openContactModal(event) {
+      if (event) event.preventDefault();
+      document.getElementById('contactModal').classList.add('open');
+    }
+
+    function closeContactModal(event) {
+      if (event) event.preventDefault();
+      document.getElementById('contactModal').classList.remove('open');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeContactModal();
+    });
+
+    const THEME_STORAGE_KEY = 'kfu_schedule_theme';
+
+    // Чистый fallback: если API недоступен, показываем пустую структуру.
+    let schedules = {
+      study: {
+        week1: {},
+        week2: {}
+      }
+    };
+
+    let currentWeek = 'week1';
+    let currentStudyForm = 'очная';
+    let allGroups = []; // метаданные всех групп из API
+
+    const DEGREE_LABELS = {
+      'бакалавриат': 'Бакалавриат',
+      'специалитет': 'Специалитет',
+      'магистратура': 'Магистратура',
+    };
+
+    async function loadFacultiesAndGroups() {
+      try {
+        const [fRes, gRes] = await Promise.all([
+          fetch('/api/faculties'),
+          fetch('/api/groups'),
+        ]);
+        const fData = await fRes.json();
+        const gData = await gRes.json();
+
+        allGroups = (gData.groups || []).map(g =>
+          typeof g === 'string' ? { name: g, study_form: 'очная', course: 0, degree: 'бакалавриат', faculty_id: null } : g
+        );
+
+        const facultySelect = document.getElementById('faculty-select');
+        facultySelect.innerHTML = '<option value="">Все факультеты</option>';
+        (fData.faculties || []).forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.id;
+          opt.textContent = f.short_name || f.name;
+          facultySelect.appendChild(opt);
+        });
+      } catch (e) {
+        console.warn('Не удалось загрузить факультеты');
+      }
+    }
+
+    function filterAndPopulateGroups() {
+      const facultyId = document.getElementById('faculty-select').value;
+      const groupSelect = document.getElementById('group-select');
+
+      let filtered = allGroups.filter(g =>
+        (g.study_form || 'очная') === currentStudyForm
+      );
+
+      if (facultyId) {
+        filtered = filtered.filter(g => String(g.faculty_id) === facultyId);
+      }
+
+      // Группировка по курсу + типу обучения
+      const DEGREE_ORDER = { 'бакалавриат': 0, 'специалитет': 1, 'магистратура': 2, 'аспирантура': 3 };
+
+      const byCourse = {};
+      filtered.forEach(g => {
+        const course = g.course || 0;
+        const degree = g.degree || 'бакалавриат';
+        const dOrder = DEGREE_ORDER[degree] ?? 9;
+        const key = `${dOrder}_${String(course).padStart(2, '0')}`;
+        if (!byCourse[key]) byCourse[key] = { course, degree, names: [] };
+        byCourse[key].names.push(g.name);
+      });
+
+      groupSelect.innerHTML = '';
+      Object.keys(byCourse).sort().forEach(key => {
+        const { course, degree, names } = byCourse[key];
+        const group = document.createElement('optgroup');
+        const courseLabel = course > 0 ? `${course} курс` : 'Другие';
+        group.label = `${courseLabel} — ${DEGREE_LABELS[degree] || degree}`;
+        names.sort().forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          group.appendChild(opt);
+        });
+        groupSelect.appendChild(group);
+      });
+
+      if (!groupSelect.options.length) {
+        const opt = new Option('Нет групп');
+        opt.disabled = true;
+        groupSelect.appendChild(opt);
+      }
+    }
+
+    const times = ['08:30', '10:25', '12:20', '14:15', '16:10', '18:20', '20:00'];
+
+    const detectLessonType = (typeStr) => {
+      if (/ПЗ|Практика|ПР/i.test(typeStr)) return 'practice';
+      if (/ЛБ|Лабораторная/i.test(typeStr)) return 'lab';
+      if (/СЕМ|Семинар/i.test(typeStr)) return 'seminar';
+      if (/Консультация/i.test(typeStr)) return 'consultation';
+      return 'lecture';
+    };
+
+    const parseLessonInfo = (content) => {
+      if (!content || content === 'Пары отсутствуют' || content === 'Свободно' || content === 'Элективная дисциплина') {
+        return null;
+      }
+
+      // Формат из админ-панели: "Лекция: Предмет || Препод: Иванов И.И. || Ауд.: 201А"
+      const adminMatch = content.match(/^([^:]+):\s*(.*?)\s*\|\|\s*Препод:\s*(.*?)\s*\|\|\s*Ауд\.?\s*:\s*(.*?)\s*$/i);
+      if (adminMatch) {
+        const typeStr = adminMatch[1].trim();
+        const subject = adminMatch[2].trim();
+        const teacher = adminMatch[3].trim();
+        const room = adminMatch[4].trim();
+        const displayTeacher = (teacher === '—' || teacher === '-' || !teacher) ? '' : teacher;
+        const displayRoom = (room === '—' || room === '-' || !room) ? '' : room;
+        return {
+          type: detectLessonType(typeStr),
+          title: subject,
+          teacher: displayTeacher,
+          fullTeacher: teacher,
+          room: displayRoom
+        };
+      }
+
+      // Старый формат: "ЛК: Предмет (Преподаватель)" или "Лекция: Предмет (Преподаватель)"
+      const match = content.match(/^(Л[КБ]|ПЗ|ПР|СЕМ|Лекция|Практика|Лабораторная|Семинар|Проект|Консультация):\s*(.+?)(?:\s*\(([^)]+)\))?$/i);
+      if (match) {
+        const teacher = match[3] || '';
+        return {
+          type: detectLessonType(match[1]),
+          title: match[2].trim(),
+          teacher,
+          fullTeacher: teacher
+        };
+      }
+
+      return null;
+    };
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    const renderGrid = () => {
+      const grid = document.querySelector('.schedule-grid');
+      const group = document.getElementById('group-select').value;
+      const schedule = (schedules.study[currentWeek] || schedules.study.week1)[group] || [];
+
+      const TYPE_NAMES = {
+        lecture: 'Лекция', practice: 'Практика',
+        lab: 'Лаб.работа', seminar: 'Семинар', consultation: 'Консультация'
+      };
+
+      const parts = [];
+
+      parts.push('<div class="schedule-header time">Время</div>');
+      ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'].forEach((day, di) => {
+        parts.push(`<div class="schedule-header day" data-col="${di}">${day}</div>`);
+      });
+
+      // Для каждого дня находим диапазон занятых пар (первая..последняя),
+      // чтобы показывать "окна" только между парами, а не до/после них
+      const colRange = [];
+      for (let col = 0; col < 6; col++) {
+        let first = -1, last = -1;
+        schedule.forEach((row, r) => {
+          const c = row[col];
+          if (c && c !== 'Пары отсутствуют' && c !== 'Свободно') {
+            if (first < 0) first = r;
+            last = r;
+          }
+        });
+        colRange[col] = { first, last };
+      }
+
+      schedule.forEach((row, rowIdx) => {
+        parts.push(`<div class="time-cell" data-time="${times[rowIdx] || ''}"></div>`);
+        row.forEach((content, colIdx) => {
+          if (!content || content === 'Пары отсутствуют' || content === 'Свободно') {
+            const { first, last } = colRange[colIdx];
+            const isGap = first >= 0 && rowIdx < last;
+            if (isGap) {
+              parts.push(`<div class="cell cell-gap" data-col="${colIdx}">
+                <span class="cell-time">${times[rowIdx] || ''}</span>
+                <div class="gap-label">Нет пары</div>
+              </div>`);
+            } else {
+              parts.push(`<div class="cell--empty" data-col="${colIdx}"></div>`);
+            }
+            return;
+          }
+
+          const lessonInfo = parseLessonInfo(content);
+          const timeTag = `<span class="cell-time">${times[rowIdx] || ''}</span>`;
+
+          if (!lessonInfo) {
+            parts.push(`<div class="cell" data-col="${colIdx}">${timeTag}<div class="lesson"><div class="lesson-title">${escapeHtml(content)}</div></div></div>`);
+            return;
+          }
+
+          const typeName = TYPE_NAMES[lessonInfo.type] || 'Лекция';
+          let cell = `<div class="cell" data-col="${colIdx}">${timeTag}<div class="lesson">
+            <div class="lesson-badge ${lessonInfo.type}">${typeName}</div>
+            <div class="lesson-title">${escapeHtml(lessonInfo.title)}</div>`;
+          if (lessonInfo.teacher) {
+            cell += `<div class="lesson-teacher">${escapeHtml(lessonInfo.teacher)}</div>`;
+          }
+          if (lessonInfo.room) {
+            cell += `<div class="lesson-room">${escapeHtml(lessonInfo.room)}</div>`;
+          }
+          cell += '</div></div>';
+          parts.push(cell);
+        });
+      });
+
+      grid.innerHTML = parts.join('');
+    };
+
+    // Initialize
+    function applyTheme(theme) {
+      const isDark = theme === 'dark';
+      document.body.classList.toggle('theme-dark', isDark);
+      document.documentElement.classList.toggle('theme-dark', isDark);
+
+      const toggleButton = document.getElementById('theme-toggle');
+      if (!toggleButton) {
+        return;
+      }
+
+      const icon = toggleButton.querySelector('.theme-toggle__icon');
+      const label = toggleButton.querySelector('.theme-toggle__label');
+      toggleButton.setAttribute('aria-pressed', String(isDark));
+
+      if (icon) {
+        icon.textContent = isDark ? '☀️' : '🌙';
+      }
+      if (label) {
+        label.textContent = isDark ? 'Светлая тема' : 'Тёмная тема';
+      }
+    }
+
+    function initThemeToggle() {
+      const toggleButton = document.getElementById('theme-toggle');
+      if (!toggleButton) {
+        return;
+      }
+
+      const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const initialTheme = storedTheme || (prefersDark ? 'dark' : 'light');
+      applyTheme(initialTheme);
+
+      toggleButton.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('theme-dark') ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      });
+    }
+
+    initThemeToggle();
+
+    document.getElementById('group-select').addEventListener('change', renderGrid);
+
+    document.getElementById('faculty-select').addEventListener('change', () => {
+      filterAndPopulateGroups();
+      renderGrid();
+    });
+
+    document.querySelectorAll('.form-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentStudyForm = btn.dataset.form;
+        document.querySelectorAll('.form-btn').forEach(b => b.classList.toggle('active', b === btn));
+        filterAndPopulateGroups();
+        renderGrid();
+      });
+    });
+
+    document.querySelectorAll('.week-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentWeek = btn.dataset.week;
+        document.querySelectorAll('.week-button').forEach(b => b.classList.toggle('active', b === btn));
+        renderGrid();
+      });
+    });
+
+    document.querySelectorAll('.day-switch-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const day = btn.dataset.day;
+        document.querySelectorAll('.day-switch-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelector('.schedule-grid').setAttribute('data-mday', day);
+      });
+    });
+
+    document.querySelectorAll('[data-schedule-type]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-schedule-type]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const type = btn.dataset.scheduleType;
+        const grid = document.querySelector('.schedule-grid');
+        if (type !== 'study') {
+          grid.innerHTML = `<div style="grid-column:1/-1;padding:48px 28px;text-align:center;color:var(--muted);font-size:1.05rem;font-weight:600;">Раздел «${btn.textContent}» в разработке</div>`;
+        } else {
+          renderGrid();
+        }
+      });
+    });
+
+    renderGrid();
+
+    async function loadSchedulesFromApi() {
+      try {
+        const [schedRes] = await Promise.all([
+          fetch('/api/schedule/all'),
+          loadFacultiesAndGroups(),
+        ]);
+
+        if (schedRes.ok) {
+          const data = await schedRes.json();
+          if (data && data.study) schedules = data;
+        }
+
+        filterAndPopulateGroups();
+        renderGrid();
+      } catch (err) {
+        console.warn('API недоступен.');
+        filterAndPopulateGroups();
+        renderGrid();
+      }
+    }
+
+    loadSchedulesFromApi();
+  </script>
+</body>
+</html>

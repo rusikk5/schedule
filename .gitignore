@@ -1,0 +1,25 @@
+# База данных — НЕ коммитим, она живёт на сервере отдельно
+schedule.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Временные файлы импорта и Excel-файлы расписания
+schedules/
+*.xlsx
+*.xls
+
+# Старые бэкапы и временные текстовые дампы
+Rozklad.html-backup.html
+all_files.txt
+struct.txt
+data*.txt
+table_data.txt
+schedule_out.txt
+schedule_raw.txt
+
+# Системное
+.DS_Store
+Thumbs.db
