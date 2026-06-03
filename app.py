@@ -2,9 +2,11 @@ import hmac
 import os
 import re
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from pathlib import Path
+
+MSK = timezone(timedelta(hours=3))  # московское время (UTC+3)
 
 from flask import Flask, jsonify, redirect, render_template_string, request, session, url_for, send_from_directory
 
@@ -528,7 +530,7 @@ def log_visit(path: str) -> None:
         with get_connection() as conn:
             conn.execute(
                 "INSERT INTO visits(ip, path, device, user_agent, visited_at) VALUES(?,?,?,?,?)",
-                (get_client_ip(), path, device, ua, datetime.now().isoformat(timespec="seconds")),
+                (get_client_ip(), path, device, ua, datetime.now(MSK).isoformat(timespec="seconds")),
             )
             conn.commit()
     except Exception:
@@ -623,7 +625,7 @@ STATS_HTML = """<!DOCTYPE html>
 @app.route("/stats")
 @login_required
 def stats():
-    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).isoformat(timespec="seconds")
+    today_start = datetime.now(MSK).replace(hour=0, minute=0, second=0, microsecond=0).isoformat(timespec="seconds")
     with get_connection() as conn:
         total = conn.execute("SELECT COUNT(*) AS c FROM visits").fetchone()["c"]
         unique = conn.execute("SELECT COUNT(DISTINCT ip) AS c FROM visits").fetchone()["c"]
