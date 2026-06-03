@@ -450,7 +450,9 @@
       display: none;
     }
 
-    body.theme-dark .cell {
+    /* Заполненные карточки в тёмной теме — с фоном и тенью.
+       Пустые "окна" (.cell-gap) исключены, чтобы на десктопе их не было видно */
+    body.theme-dark .cell:not(.cell-gap) {
       background: var(--surface-strong);
       border: 1px solid var(--border);
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
