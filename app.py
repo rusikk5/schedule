@@ -264,9 +264,10 @@ LOGIN_HTML = """<!DOCTYPE html>
       font-family:'Nunito',system-ui,sans-serif;color:#0f1d40}
     .card{background:#fff;border-radius:28px;padding:48px 40px;
       box-shadow:0 24px 60px rgba(15,29,64,.10);width:100%;max-width:400px;margin:24px}
-    .logo{width:56px;height:56px;border-radius:14px;
-      background:linear-gradient(135deg,#2563c7,#2f7ae3);color:#fff;
-      font-weight:900;font-size:1.1rem;display:grid;place-items:center;margin:0 auto 20px}
+    .logo{width:64px;height:64px;border-radius:16px;overflow:hidden;
+      display:grid;place-items:center;margin:0 auto 20px;
+      box-shadow:0 10px 26px rgba(47,122,227,.28)}
+    .logo img{width:100%;height:100%;object-fit:cover}
     h1{text-align:center;font-size:1.4rem;font-weight:800;margin-bottom:6px}
     .sub{text-align:center;color:#6b7794;font-size:.95rem;margin-bottom:32px}
     label{display:block;font-weight:700;font-size:.88rem;color:#6b7794;margin-bottom:6px}
@@ -287,7 +288,7 @@ LOGIN_HTML = """<!DOCTYPE html>
 </head>
 <body>
   <div class="card">
-    <div class="logo">КФУ</div>
+    <div class="logo"><img src="/kfu.png" alt="КФУ"></div>
     <h1>Вход в админ-панель</h1>
     <p class="sub">Расписание занятий КФУ</p>
     {% if error %}<div class="error">{{ error }}</div>{% endif %}
