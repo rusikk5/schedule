@@ -406,10 +406,10 @@
     }
 
     .template-status {
-      margin-top: 10px;
       font-size: 0.88rem;
       color: var(--muted);
       font-weight: 600;
+      padding: 16px 16px 0;
     }
 
     .table-wrapper {
@@ -1168,32 +1168,33 @@
       </div>
     </div>
 
-    <div class="admin-table">
-      <div class="quick-fill-panel">
-        <div class="template-field">
-          <label for="lessonTypeSelect">Тип занятия</label>
-          <select id="lessonTypeSelect" class="template-select">
-            <option value="Лекция">Лекция</option>
-            <option value="Практика">Практика</option>
-          </select>
-        </div>
-        <div class="template-field">
-          <label for="subjectInput">Предмет</label>
-          <input id="subjectInput" class="template-input" list="subjectOptions" placeholder="Выбери или введи предмет" />
-        </div>
-        <div class="template-field">
-          <label for="teacherInput">Преподаватель</label>
-          <input id="teacherInput" class="template-input" list="teacherOptions" placeholder="Выбери или введи преподавателя" />
-        </div>
-        <div class="template-field">
-          <label for="roomInput">Аудитория</label>
-          <input id="roomInput" class="template-input" list="roomOptions" placeholder="Например: 201" />
-        </div>
-        <div class="template-actions">
-          <button class="btn primary" type="button" onclick="applyTemplateToActiveCell()">Вставить в выбранные ячейки</button>
-          <button class="btn" type="button" onclick="clearActiveCell()">Очистить выбранные</button>
-        </div>
+    <div class="quick-fill-panel">
+      <div class="template-field">
+        <label for="lessonTypeSelect">Тип занятия</label>
+        <select id="lessonTypeSelect" class="template-select">
+          <option value="Лекция">Лекция</option>
+          <option value="Практика">Практика</option>
+        </select>
       </div>
+      <div class="template-field">
+        <label for="subjectInput">Предмет</label>
+        <input id="subjectInput" class="template-input" list="subjectOptions" placeholder="Выбери или введи предмет" />
+      </div>
+      <div class="template-field">
+        <label for="teacherInput">Преподаватель</label>
+        <input id="teacherInput" class="template-input" list="teacherOptions" placeholder="Выбери или введи преподавателя" />
+      </div>
+      <div class="template-field">
+        <label for="roomInput">Аудитория</label>
+        <input id="roomInput" class="template-input" list="roomOptions" placeholder="Например: 201" />
+      </div>
+      <div class="template-actions">
+        <button class="btn primary" type="button" onclick="applyTemplateToActiveCell()">Вставить в выбранные ячейки</button>
+        <button class="btn" type="button" onclick="clearActiveCell()">Очистить выбранные</button>
+      </div>
+    </div>
+
+    <div class="admin-table">
       <datalist id="subjectOptions"></datalist>
       <datalist id="teacherOptions"></datalist>
       <datalist id="roomOptions"></datalist>
