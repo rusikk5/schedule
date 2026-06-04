@@ -363,6 +363,14 @@
       grid-template-columns: repeat(4, minmax(180px, 1fr)) auto;
       gap: 10px;
       align-items: end;
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      box-shadow: 0 10px 28px rgba(15, 29, 64, 0.14);
+    }
+
+    body.theme-dark .quick-fill-panel {
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
     }
 
     .template-field {
